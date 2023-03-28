@@ -161,7 +161,9 @@ Up until now we've joined two tables together. But we actually have three tables
 ```{r}
 
 
-counties_demographics counties_elexresults counties_
+merged_table2 <- left_join(counties_elexresults, counties_rural_urban_suburban, by = "geoid")
+
+merged_table4 <- left_join(merged_table1, counties_demographics, by = "geoid")
 
 
 
