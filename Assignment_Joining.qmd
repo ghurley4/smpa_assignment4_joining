@@ -41,7 +41,13 @@ Join together the election results and urban/suburban/rural tables above, and th
 
 ```{r}
 
+merged_table <- left_join(counties_elexresults, counties_rural_urban_suburban, by = "geoid")
 
+virginia_table <- filter(merged_table, state_code == "VA")
+
+virginia_table %>%
+  group_by(rural_urban) %>%
+  summarize(mean_pct_r_2020 = mean(pct_r_2020))
 
 
 ```
@@ -56,7 +62,11 @@ Using the joined election results / urban/suburban/rural table created above:
 
 ```{r}
 
-
+virginia_table %>%
+  group_by(rural_urban, winner_2020) %>%
+  summarise(count = n()) %>%
+  pivot_wider(names_from = winner_2020, values_from = count) %>%
+  replace(is.na(.), 0)
 
 
 ```
@@ -71,7 +81,17 @@ Join together the election results and demographics tables above, and then use t
 
 ```{r}
 
+merged_table1 <- left_join(counties_elexresults, counties_demographics, by = "pct_d_2020")
 
+florida_table <- filter(merged_table1, state_code == "FL")
+
+
+national_avg_college <- mean(florida_table$pct_ed_college_all)
+
+florida_table %>%
+  mutate(college_abovebelow_natl = ifelse(pct_ed_college_all > national_avg_college, "Above national average", "Below national average")) %>%
+  group_by(college_abovebelow_natl) %>%
+  summarize(mean_pct_r_2020 = mean(pct_r_2020.x))
 
 
 ```
@@ -86,7 +106,12 @@ Using the joined table you made above:
 
 ```{r}
 
+national_avg_college <- mean(merged_table1$pct_ed_college_all)
 
+merged_table1 %>%
+  mutate(college_abovebelow_natl = ifelse(pct_ed_college_all > national_avg_college, "Above national average", "Below national average")) %>%
+  group_by(college_abovebelow_natl) %>%
+  summarize(mean_pct_r_2020 = mean(pct_r_2020.x))
 
 
 ```
@@ -96,6 +121,16 @@ Now using the joined datasets above, come up with two groupings you find interes
 5)  
 
 ```{r}
+#This table groups counties in Pennsylvania by their rural-urban status and calculates the mean percentage of the Biden 2020 vote and the Clinton 2016 vote in each group. 
+
+merged_table3 <- left_join(counties_elexresults, counties_rural_urban_suburban, by = "geoid")
+
+pennsylvania_table <- filter(merged_table3, state_code == "PA")
+
+pennsylvania_table %>%
+  group_by(rural_urban) %>%
+  summarize(mean_pct_d_2020 = mean(pct_d_2020),
+            mean_pct_d_2016 = mean(pct_d_2016))
 
 
 
@@ -105,6 +140,13 @@ Now using the joined datasets above, come up with two groupings you find interes
 6)  
 
 ```{r}
+
+# This groups counties in Pennsylvania by their rural-urban status and calculates the mean change in percentage vote share for Trump and Biden between 2016 and 2020 in each group. 
+
+pennsylvania_table %>%
+  group_by(rural_urban) %>%
+  summarize(mean_pct_r_change = mean(pct_r_2020 - pct_r_2016),
+            mean_pct_d_change = mean(pct_d_2020 - pct_d_2016))
 
 
 
@@ -119,7 +161,7 @@ Up until now we've joined two tables together. But we actually have three tables
 ```{r}
 
 
-
+counties_demographics counties_elexresults counties_
 
 
 
